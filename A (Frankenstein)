@@ -1,0 +1,54 @@
+from collections import defaultdict
+
+# Recipe book to store potion recipes
+recipe_book = defaultdict(list)
+# Memoization map to avoid redundant calculations
+memo = {}
+
+def calculate_minimum_orbs(potion):
+    # Base case: If the potion is not in the recipe book, it's a basic ingredient requiring 0 orbs
+    if potion not in recipe_book:
+        return 0
+
+    # If the result is already calculated, return it
+    if potion in memo:
+        return memo[potion]
+
+    # Initialize the minimum orbs required to a very large value
+    min_orbs = float('inf')
+
+    # Loop through all recipes for the potion
+    for recipe in recipe_book[potion]:
+        orbs_required = len(recipe) - 1  # Orbs required for combining ingredients
+
+        # Add the orbs required for each ingredient
+        for ingredient in recipe:
+            orbs_required += calculate_minimum_orbs(ingredient)
+
+        # Update the minimum orbs required
+        min_orbs = min(min_orbs, orbs_required)
+
+    # Store the result in the memo map for future use
+    memo[potion] = min_orbs
+    return min_orbs
+
+def main():
+    # Read the number of recipes
+    n = int(input())
+
+    # Read each recipe and store it in the recipe book
+    for _ in range(n):
+        line = input().strip()
+        potion, ingredients = line.split("=")
+        ingredients = ingredients.split("+")  # Ingredients for the potion
+        recipe_book[potion].append(ingredients)
+
+    # Read the target potion name
+    target_potion = input().strip()
+
+    # Calculate the minimum orbs required to brew the target potion
+    result = calculate_minimum_orbs(target_potion)
+    print(result)
+
+if __name__ == "__main__":
+    main()
